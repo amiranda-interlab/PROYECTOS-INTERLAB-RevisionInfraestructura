@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<c3p0-config>
+    <default-config>
+        <property name="acquireIncrement">3</property>
+        <property name="minPoolSize">1</property>
+        <property name="initialPoolSize">3</property>
+        <property name="maxPoolSize">12</property>
+        <property name="maxConnectionAge">43200</property>
+        <property name="maxIdleTime">21600</property>    
+        <property name="checkoutTimeout">300000</property>    
+    </default-config> 
+    <named-config name="dsDbIntranet">      
+        <property name="jdbcUrl">jdbc:jtds:sqlserver://172.30.0.10/dbIntranet</property>
+        <property name="driverClass">net.sourceforge.jtds.jdbc.Driver</property>
+        <property name="user">user_inter_erp</property>
+        <property name="password">Int3rl4b2oi9</property>
+        <property name="testConnectionOnCheckout">true</property>
+        <property name="preferredTestQuery">select 1</property>
+    </named-config>     
+</c3p0-config>
