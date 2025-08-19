@@ -89,17 +89,17 @@ public abstract class Util {
 //            msg.setSubject(asunto);
 //            msg.setSentDate(new Date());
 //            msg.setText(mensaje);
-            
+
             msg.setRecipients(Message.RecipientType.TO, address);
             msg.setSubject(asunto);
             msg.setSentDate(new Date());
-            
+
             Multipart multipart = new MimeMultipart();
             MimeBodyPart textPart = new MimeBodyPart();
             textPart.setContent(mensaje, "text/html; charset=utf-8");
             multipart.addBodyPart(textPart, 0);//PRIMERO EL TEXTO 
-            msg.setContent(multipart);            
-            
+            msg.setContent(multipart);
+
             Transport.send(msg);
         } catch (Throwable e) {
             System.out.println("Error al enviar correo: " + e);
@@ -153,13 +153,12 @@ public abstract class Util {
 //        
         cadena = Normalizer.normalize(cadena, Normalizer.Form.NFD);
         cadena = cadena.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
-        
-        
+
         String charsToRemove = "!'";
- 
+
         for (char c : charsToRemove.toCharArray()) {
             cadena = cadena.replace(String.valueOf(c), "");
-        }       
+        }
 
         return cadena.trim();
     }
@@ -404,11 +403,11 @@ public abstract class Util {
         calendar.add(calendar.YEAR, anios);
         return calendar.getTime();
     }
-    
+
     public static Date sumarRestarDias(Date fecha, int dias) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(fecha);
         calendar.add(calendar.DAY_OF_YEAR, dias);
         return calendar.getTime();
-    }    
+    }
 }
