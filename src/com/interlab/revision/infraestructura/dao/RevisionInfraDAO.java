@@ -17,7 +17,7 @@ public class RevisionInfraDAO {
                 + " general.fn_decifra(nombre_motor_base) AS nombre_motor_base, "
                 + " general.fn_decifra(ip_motor_base) AS ip_motor_base, "
                 + " general.fn_decifra(nombre_base) AS nombre_base, "
-                + " general.fn_decifra(ruta_respaldo_bak) AS ruta_respaldo_bak, "
+                + " general.fn_decifra(ruta_respaldo_bak) AS ruta_respaldo_bak, periodo, "
                 + " estado "
                 + " FROM controldba.bases "
                 + " WHERE estado = 1 "
@@ -35,6 +35,7 @@ public class RevisionInfraDAO {
                 rein.setNombreBase(rs.getString("nombre_base"));
                 rein.setRutaRespaldoBak(rs.getString("ruta_respaldo_bak"));
                 rein.setEstado(rs.getInt("estado"));
+                rein.setPeriodo(rs.getString("periodo"));
 
                 lista.add(rein);
             }

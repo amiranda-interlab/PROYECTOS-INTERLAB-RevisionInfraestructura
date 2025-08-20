@@ -124,7 +124,7 @@ public class RevisionArchivosBackupsBD {
                     .append("<th>IP Motor Base</th>")
                     .append("<th>Nombre Base</th>")
                     .append("<th>Ruta Respaldo</th>")
-                    .append("<th>Estado</th>")
+                    .append("<th>Periodo</th>")
                     .append("<th>Existe Backups</th>")
                     .append("</tr>");
 
@@ -138,7 +138,11 @@ public class RevisionArchivosBackupsBD {
                         .append("<td>").append(base.getIpMotorBase()).append("</td>")
                         .append("<td>").append(base.getNombreBase()).append("</td>")
                         .append("<td>").append(base.getRutaRespaldoBak()).append("</td>")
-                        .append("<td>").append(base.getEstado()).append("</td>")
+                        .append("<td style='color:")
+                        .append("DIARIO".equals(base.getPeriodo()) ? "black" : "blue")
+                        .append(";'>")
+                        .append("DIARIO".equals(base.getPeriodo()) ? "DIARIO" : "MENSUAL")
+                        .append("</td>")
                         .append("<td style='color:").append(base.isExisteBackup() ? "black" : "red").append(";'>")
                         .append(base.isExisteBackup() ? "SI" : "NO")
                         .append("</td>")

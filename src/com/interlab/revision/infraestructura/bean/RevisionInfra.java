@@ -9,7 +9,8 @@ public class RevisionInfra {
     private String nombreBase;
     private String rutaRespaldoBak;
     private int estado;
-    private boolean existeBackup; 
+    private boolean existeBackup;
+    private String periodo;
 
     // Getters y Setters
     public String getCodigoDb() {
@@ -74,5 +75,13 @@ public class RevisionInfra {
 
     public void setExisteBackup(boolean existeBackup) {
         this.existeBackup = existeBackup;
+    }
+    
+    public String getPeriodo() {
+        return periodo;
+    }
+
+    public void setPeriodo(String periodo) {
+        this.periodo = periodo;
     }
 }
