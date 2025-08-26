@@ -39,11 +39,11 @@ public class RevisionArchivosBackupsBD {
 
         List<Proparametro> lst_correos = new ArrayList<>();
         Proparametro para = new Proparametro();
-        Proparametro para1 = new Proparametro();
+        //Proparametro para1 = new Proparametro();
         para.setParvalor("amiranda@interlabsa.com");
-        para1.setParvalor("soportetecnico@interlabsa.com");
+        //para1.setParvalor("soportetecnico@interlabsa.com");
         lst_correos.add(para);
-        lst_correos.add(para1);
+        //lst_correos.add(para1);
 
         try {
             //Inicializar conexiones
@@ -151,11 +151,11 @@ public class RevisionArchivosBackupsBD {
 
             tablaHtml.append("</table>");
 
-            String asunto = "Reporte de Backups SQL - Estado de Respaldos";
-            String cuerpoCorreo = "<p>Estimado equipo,</p>"
-                    + "<p>Se adjunta el estado de los respaldos de las bases de datos activas:</p>"
+            String fechaHoy_ddmmyyyy = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
+            String asunto = "Reporte de archivos Backups de SQL SERVER - Fecha: " + fechaHoy_ddmmyyyy;
+            String cuerpoCorreo = "<p>Checklist de backup diarios:</p>"
                     + tablaHtml.toString()
-                    + "<p>Saludos,<br/>Josue Miranda Villalta / Soporte Tecnico</p>";
+                    + "<p>Reporte Automatico, no responder.</p>";
 
             Util.enviarCorreo(lst_correos, "administrador@interlabsa.com", "smtp.gmail.com", "587", asunto, cuerpoCorreo);
             Util.tiempoEjecucion(dt);
@@ -163,7 +163,7 @@ public class RevisionArchivosBackupsBD {
 
         } catch (Exception ex) {
             logger.error(ex, ex);
-            Util.enviarCorreo(lst_correos, "soportetecnico@interlabsa.com", "smtp.gmail.com", "587",
+            Util.enviarCorreo(lst_correos, "administrador@interlabsa.com", "smtp.gmail.com", "587",
                     "Error en proceso de revisión de Archivos Backups SQL", ex.toString());
             try {
                 if (con_intranet != null) {
