@@ -17,5 +17,13 @@
         <property name="password">Int3rl4b2oi9</property>
         <property name="testConnectionOnCheckout">true</property>
         <property name="preferredTestQuery">select 1</property>
+    </named-config>
+    <named-config name="dsDbInterERP">      
+        <property name="jdbcUrl">jdbc:jtds:sqlserver://172.30.0.12:1433;databaseName=dbInterERPPRU7</property>
+        <property name="driverClass">net.sourceforge.jtds.jdbc.Driver</property>
+        <property name="user">inter_erp</property>
+        <property name="password">Int3rl4b2oi9</property>
+        <property name="testConnectionOnCheckout">true</property>
+        <property name="preferredTestQuery">select 1</property>
     </named-config>     
 </c3p0-config>
