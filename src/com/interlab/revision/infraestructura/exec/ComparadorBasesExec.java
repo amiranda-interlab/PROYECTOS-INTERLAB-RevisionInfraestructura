@@ -1,6 +1,6 @@
 package com.interlab.revision.infraestructura.exec;
 
-import com.interlab.revision.infraestructura.base.DBInterERP;
+import com.interlab.revision.infraestructura.base.DB;
 import com.interlab.revision.infraestructura.bean.Columna;
 import com.interlab.revision.infraestructura.bean.Tabla;
 import com.interlab.revision.infraestructura.bean.Esquema;
@@ -15,10 +15,10 @@ import java.util.List;
 public class ComparadorBasesExec {
 
     public static void main(String[] args) {
-        Connection con_intererp = null;
+        Connection con = null;
 
-        String base1 = "dbInterERP";
-        String base2 = "dbInterERPPRU7";
+        String base1 = "Labcore";
+        String base2 = "LabcoreMatriz";
 
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Comparación de Bases");
@@ -55,12 +55,12 @@ public class ComparadorBasesExec {
         bodyCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 
         try {
-            con_intererp = DBInterERP.getConnectionDbInterERP();
-
+            //con = DBInterERP.getConnectionDbInterERP();
+            con = DB.getConnectionLacorePrueba();
             ComparadorDAO dao = new ComparadorDAO();
 
-            Esquema esquema1 = dao.obtenerEsquema(con_intererp, base1);
-            Esquema esquema2 = dao.obtenerEsquema(con_intererp, base2);
+            Esquema esquema1 = dao.obtenerEsquema(con, base1);
+            Esquema esquema2 = dao.obtenerEsquema(con, base2);
 
             // Crear encabezado del Excel con estilo y mayúsculas
             int rowNum = 0;
@@ -146,8 +146,8 @@ public class ComparadorBasesExec {
             }
 
             // Guardar archivo Excel en ruta específica
-            String rutaArchivo = "C:\\Users\\kpesantez\\Desktop\\ArchivoComparacion\\ComparacionBases.xlsx";
-            File directorio = new File("C:\\Users\\kpesantez\\Desktop\\ArchivoComparacion");
+            String rutaArchivo = "C:\\ArchivoComparacion\\ComparacionBases.xlsx";
+            File directorio = new File("C:\\ArchivoComparacion");
             if (!directorio.exists()) {
                 directorio.mkdirs(); // Crea la carpeta si no existe
             }
@@ -160,7 +160,7 @@ public class ComparadorBasesExec {
             System.err.println("Error en la comparación: " + e.getMessage());
             e.printStackTrace();
         } finally {
-            DBInterERP.safeClose(con_intererp);
+            DB.safeClose(con);
             try {
                 workbook.close();
             } catch (Exception e) {

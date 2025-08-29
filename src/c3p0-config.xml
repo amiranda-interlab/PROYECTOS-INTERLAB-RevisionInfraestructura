@@ -26,4 +26,12 @@
         <property name="testConnectionOnCheckout">true</property>
         <property name="preferredTestQuery">select 1</property>
     </named-config>     
+    <named-config name="dsLabcorePrueba">      
+        <property name="jdbcUrl">jdbc:jtds:sqlserver://172.16.0.11:1700;databaseName=Labcore</property>
+        <property name="driverClass">net.sourceforge.jtds.jdbc.Driver</property>
+        <property name="user">sa</property>
+        <property name="password">labcoresql2000</property>
+        <property name="testConnectionOnCheckout">true</property>
+        <property name="preferredTestQuery">select 1</property>
+    </named-config>    
 </c3p0-config>

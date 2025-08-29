@@ -15,9 +15,11 @@ import java.util.Properties;
 
 public final class DB {
 
-    private static final Logger logger = Logger.getLogger(DB.class);    
+    private static final Logger logger = Logger.getLogger(DB.class);
     private static DataSource dsDbIntranet = null;
-    
+    private static DataSource dsDbInterERP = null;
+    private static DataSource dsLabcorePrueba = null;
+
     private static String DIR_FILE_SERVER;
 
     private static String FILE_PROD_SERVER;
@@ -33,7 +35,11 @@ public final class DB {
     public static synchronized void init() {
         logger.debug("Inicializando DataSources...");
         ComboPooledDataSource cpds = new ComboPooledDataSource("dsDbIntranet");
-        dsDbIntranet = cpds;                                
+        dsDbIntranet = cpds;
+        ComboPooledDataSource cpds1 = new ComboPooledDataSource("dsLabcorePrueba");
+        dsLabcorePrueba = cpds1;
+        ComboPooledDataSource cpds2 = new ComboPooledDataSource("dsDbInterERP");
+        dsDbInterERP = cpds2;
         logger.debug("DataSources inicializados");
         initStaticVars();
     }
@@ -63,9 +69,22 @@ public final class DB {
         return con;
     }
 
-   
-    
-    
+    public static Connection getConnectionLacorePrueba() throws SQLException {
+        if (dsLabcorePrueba == null) {
+            init();
+        }
+        Connection con = dsLabcorePrueba.getConnection();
+        return con;
+    }
+
+    public static Connection getConnectionDbInterERP() throws SQLException {
+        if (dsDbInterERP == null) {
+            init();
+        }
+        Connection con = dsDbInterERP.getConnection();
+        return con;
+    }
+
     public static void safeClose(Connection conn) {
         try {
             if (conn != null) {
