@@ -55,10 +55,11 @@ public class ComparadorBasesExec {
         bodyCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 
         try {
-            //con = DBInterERP.getConnectionDbInterERP();
+            //con = DB.getConnectionDbInterERP();
             con = DB.getConnectionLacorePrueba();
             ComparadorDAO dao = new ComparadorDAO();
 
+            // Obtener esquemas de ambas bases
             Esquema esquema1 = dao.obtenerEsquema(con, base1);
             Esquema esquema2 = dao.obtenerEsquema(con, base2);
 
@@ -73,26 +74,25 @@ public class ComparadorBasesExec {
                 cell.setCellStyle(headerCellStyle);
             }
 
+            // Tablas y columnas
             List<Tabla> tablas1 = esquema1.getTablas();
             List<Tabla> tablas2 = esquema2.getTablas();
 
             // Tablas exclusivas en base2
             for (Tabla t2 : tablas2) {
-                boolean existeEn1 = tablas1.stream()
-                        .anyMatch(t -> t.getNombre().equalsIgnoreCase(t2.getNombre()));
+                boolean existeEn1 = tablas1.stream().anyMatch(t -> t.getNombre().equalsIgnoreCase(t2.getNombre()));
                 if (!existeEn1) {
-                    String observacion = "Tabla '" + t2.getNombre() + "' está en " + base2 + " pero no en " + base1;
-                    agregarFila(sheet, rowNum++, base2, "Tabla", t2.getNombre(), observacion, bodyCellStyle);
+                    agregarFila(sheet, rowNum++, base2, "Tabla", t2.getNombre(),
+                            "Tabla '" + t2.getNombre() + "' está en " + base2 + " pero no en " + base1, bodyCellStyle);
                 }
             }
 
             // Tablas exclusivas en base1
             for (Tabla t1 : tablas1) {
-                boolean existeEn2 = tablas2.stream()
-                        .anyMatch(t -> t.getNombre().equalsIgnoreCase(t1.getNombre()));
+                boolean existeEn2 = tablas2.stream().anyMatch(t -> t.getNombre().equalsIgnoreCase(t1.getNombre()));
                 if (!existeEn2) {
-                    String observacion = "Tabla '" + t1.getNombre() + "' está en " + base1 + " pero no en " + base2;
-                    agregarFila(sheet, rowNum++, base1, "Tabla", t1.getNombre(), observacion, bodyCellStyle);
+                    agregarFila(sheet, rowNum++, base1, "Tabla", t1.getNombre(),
+                            "Tabla '" + t1.getNombre() + "' está en " + base1 + " pero no en " + base2, bodyCellStyle);
                 }
             }
 
@@ -100,19 +100,14 @@ public class ComparadorBasesExec {
             for (Tabla t2 : tablas2) {
                 Tabla t1 = tablas1.stream()
                         .filter(tb -> tb.getNombre().equalsIgnoreCase(t2.getNombre()))
-                        .findFirst()
-                        .orElse(null);
+                        .findFirst().orElse(null);
                 if (t1 != null) {
-                    List<Columna> cols2 = t2.getColumnas();
-                    List<Columna> cols1 = t1.getColumnas();
-
-                    for (Columna c2 : cols2) {
-                        boolean existeEn1 = cols1.stream()
+                    for (Columna c2 : t2.getColumnas()) {
+                        boolean existeEn1 = t1.getColumnas().stream()
                                 .anyMatch(c -> c.getNombre().equalsIgnoreCase(c2.getNombre()));
                         if (!existeEn1) {
-                            String nombreObjeto = t2.getNombre() + "." + c2.getNombre();
-                            String observacion = "Columna '" + c2.getNombre() + "' en tabla '" + t2.getNombre() + "' está en " + base2 + " pero no en " + base1;
-                            agregarFila(sheet, rowNum++, base2, "Columna", nombreObjeto, observacion, bodyCellStyle);
+                            agregarFila(sheet, rowNum++, base2, "Columna", t2.getNombre() + "." + c2.getNombre(),
+                                    "Columna está en " + base2 + " pero no en " + base1, bodyCellStyle);
                         }
                     }
                 }
@@ -122,25 +117,66 @@ public class ComparadorBasesExec {
             for (Tabla t1 : tablas1) {
                 Tabla t2 = tablas2.stream()
                         .filter(tb -> tb.getNombre().equalsIgnoreCase(t1.getNombre()))
-                        .findFirst()
-                        .orElse(null);
+                        .findFirst().orElse(null);
                 if (t2 != null) {
-                    List<Columna> cols1 = t1.getColumnas();
-                    List<Columna> cols2 = t2.getColumnas();
-
-                    for (Columna c1 : cols1) {
-                        boolean existeEn2 = cols2.stream()
+                    for (Columna c1 : t1.getColumnas()) {
+                        boolean existeEn2 = t2.getColumnas().stream()
                                 .anyMatch(c -> c.getNombre().equalsIgnoreCase(c1.getNombre()));
                         if (!existeEn2) {
-                            String nombreObjeto = t1.getNombre() + "." + c1.getNombre();
-                            String observacion = "Columna '" + c1.getNombre() + "' en tabla '" + t1.getNombre() + "' está en " + base1 + " pero no en " + base2;
-                            agregarFila(sheet, rowNum++, base1, "Columna", nombreObjeto, observacion, bodyCellStyle);
+                            agregarFila(sheet, rowNum++, base1, "Columna", t1.getNombre() + "." + c1.getNombre(),
+                                    "Columna está en " + base1 + " pero no en " + base2, bodyCellStyle);
                         }
                     }
                 }
             }
 
-            // Ajustar el tamaño de las columnas automáticamente
+            // Comparaciones para otros objetos (Procedimientos, Vistas, Funciones, Triggers, Synonyms)
+            // Stored Procedure
+            rowNum = compararObjetosGenericos(sheet, dao.obtenerStoredProcedures(con, base1),
+                    dao.obtenerStoredProcedures(con, base2), base1, base2, "Stored Procedure", sheet, rowNum, bodyCellStyle);
+
+            // Vistas
+            rowNum = compararObjetosGenericos(sheet, dao.obtenerVistas(con, base1),
+                    dao.obtenerVistas(con, base2), base1, base2, "Vista", sheet, rowNum, bodyCellStyle);
+
+            // Funciones
+            rowNum = compararObjetosGenericos(sheet, dao.obtenerFunciones(con, base1),
+                    dao.obtenerFunciones(con, base2), base1, base2, "Función", sheet, rowNum, bodyCellStyle);
+
+            // Triggers
+            rowNum = compararObjetosGenericos(sheet, dao.obtenerTriggers(con, base1),
+                    dao.obtenerTriggers(con, base2), base1, base2, "Trigger", sheet, rowNum, bodyCellStyle);
+
+            // Synonyms
+            rowNum = compararObjetosGenericos(sheet, dao.obtenerSynonyms(con, base1),
+                    dao.obtenerSynonyms(con, base2), base1, base2, "Synonym", sheet, rowNum, bodyCellStyle);
+
+            // Usuarios
+            rowNum = compararObjetosGenericos(sheet,
+                    dao.obtenerUsuarios(con, base1),
+                    dao.obtenerUsuarios(con, base2),
+                    base1, base2, "Usuario", sheet, rowNum, bodyCellStyle);
+
+            // Roles
+            rowNum = compararObjetosGenericos(sheet,
+                    dao.obtenerRoles(con, base1),
+                    dao.obtenerRoles(con, base2),
+                    base1, base2, "Rol", sheet, rowNum, bodyCellStyle);
+
+            // Permisos
+            rowNum = compararObjetosGenericos(sheet,
+                    dao.obtenerPermisos(con, base1),
+                    dao.obtenerPermisos(con, base2),
+                    base1, base2, "Permiso", sheet, rowNum, bodyCellStyle);
+
+            // Inicios de sesión
+            // OJO: logins se comparan a nivel de servidor, no por base
+            rowNum = compararObjetosGenericos(sheet,
+                    dao.obtenerLogins(con),
+                    dao.obtenerLogins(con),
+                    "Servidor", "Servidor", "Login", sheet, rowNum, bodyCellStyle);
+
+            // Ajustar ancho de columnas automáticamente
             for (int i = 0; i < titles.length; i++) {
                 sheet.autoSizeColumn(i);
             }
@@ -149,7 +185,7 @@ public class ComparadorBasesExec {
             String rutaArchivo = "C:\\ArchivoComparacion\\ComparacionBases.xlsx";
             File directorio = new File("C:\\ArchivoComparacion");
             if (!directorio.exists()) {
-                directorio.mkdirs(); // Crea la carpeta si no existe
+                directorio.mkdirs();
             }
             try (FileOutputStream fileOut = new FileOutputStream(rutaArchivo)) {
                 workbook.write(fileOut);
@@ -171,21 +207,30 @@ public class ComparadorBasesExec {
 
     private static void agregarFila(Sheet sheet, int rowNum, String base, String tipo, String nombre, String observacion, CellStyle style) {
         Row row = sheet.createRow(rowNum);
+        row.createCell(0).setCellValue(base);
+        row.createCell(1).setCellValue(tipo);
+        row.createCell(2).setCellValue(nombre);
+        row.createCell(3).setCellValue(observacion);
+        for (int i = 0; i < 4; i++) {
+            row.getCell(i).setCellStyle(style);
+        }
+        // Log en consola
+        System.out.println("[LOG] Base: " + base + " | Tipo: " + tipo + " | Objeto: " + nombre + " | Observación: " + observacion);
+    }
 
-        Cell cell0 = row.createCell(0);
-        cell0.setCellValue(base);
-        cell0.setCellStyle(style);
-
-        Cell cell1 = row.createCell(1);
-        cell1.setCellValue(tipo);
-        cell1.setCellStyle(style);
-
-        Cell cell2 = row.createCell(2);
-        cell2.setCellValue(nombre);
-        cell2.setCellStyle(style);
-
-        Cell cell3 = row.createCell(3);
-        cell3.setCellValue(observacion);
-        cell3.setCellStyle(style);
+    private static int compararObjetosGenericos(Sheet sheet, List<String> lista1, List<String> lista2,
+            String base1, String base2, String tipo,
+            Sheet hoja, int rowNum, CellStyle style) {
+        for (String obj : lista2) {
+            if (!lista1.contains(obj)) {
+                agregarFila(hoja, rowNum++, base2, tipo, obj, tipo + " está en " + base2 + " pero no en " + base1, style);
+            }
+        }
+        for (String obj : lista1) {
+            if (!lista2.contains(obj)) {
+                agregarFila(hoja, rowNum++, base1, tipo, obj, tipo + " está en " + base1 + " pero no en " + base2, style);
+            }
+        }
+        return rowNum;
     }
 }
